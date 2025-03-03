@@ -6,10 +6,10 @@ settings:
 
 patchedDependencies:
   '@types/less@3.0.6':
-    hash: krcufrsfhsuxuoj7hocqugs6zi
+    hash: 641e6c93bb737bac7fc283416857bd095cd85bcbcba63becb7a8bbcc78f73076
     path: patches/@types__less@3.0.6.patch
   eslint@9.20.1:
-    hash: xm46kqcmdgzlmm4aifkfpxaho4
+    hash: 4f22e92770bf528b2448fbec0984b9c0761dd588ed0e83dcc41edfc9af711215
     path: patches/eslint@9.20.1.patch
 
 importers:
@@ -30,7 +30,7 @@ importers:
         version: 0.3.5
       '@types/less':
         specifier: ^3.0.6
-        version: 3.0.6(patch_hash=krcufrsfhsuxuoj7hocqugs6zi)
+        version: 3.0.6(patch_hash=641e6c93bb737bac7fc283416857bd095cd85bcbcba63becb7a8bbcc78f73076)
       '@types/stylus':
         specifier: ^0.48.42
         version: 0.48.42
