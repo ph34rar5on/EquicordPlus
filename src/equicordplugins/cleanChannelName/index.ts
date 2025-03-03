@@ -34,10 +34,9 @@ export default definePlugin({
                     };
                     return smallCapsToNormal[match];
                 })
-                .replace(/[^\u0020-\u007E]?\p{Extended_Pictographic}[^\u0020-\u007E]?/ug, "")
-                .replace(/-?[^\p{Letter}\u0020-\u007E]-?/ug, [2, 4].includes(channel.type) ? " " : "-")
-                .replace(/(^-|-$)/g, "")
-                .replace(/-+/g, "-");
+                .replace(/-+/g, " ") // Replace dashes with spaces
+                .replace(/(^\s+|\s+$)/g, "") // Trim leading and trailing spaces
+                .replace(/\s+/g, " "); // Replace multiple spaces with a single space
         }
         return channel;
     }
