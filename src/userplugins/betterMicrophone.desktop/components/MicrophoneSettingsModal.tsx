@@ -142,7 +142,7 @@ export const MicrophoneSettingsModal = (props: MicrophoneSettingsModalProps) => 
                     setChannelsEnabled(status); 
                     if (status) setChannels(2);
                 }}
-        </SettingsModalCard>;
+        </SettingsModalCard>;}
 
     const settingsCardVoiceBitrate =
         <SettingsModalCard
