@@ -40,7 +40,7 @@ const checkUser = (user: User, indType: string) => {
 };
 
 const badge: ProfileBadge = {
-    component: (u: { user: User; }) => checkUser(u.user, "badges"),
+    component: (props: ProfileBadge & BadgeUserArgs) => checkUser(props.user, "badges"),
     position: BadgePosition.START,
     shouldShow: _ => true,
     key: "newuser-indicator"
