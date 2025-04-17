@@ -37,7 +37,7 @@ function searchButtonHandler(user: User, searchContextId: string, modifier: bool
     const query: { author_id: [string], channel_id?: [string]; } = { author_id: [user.id] };
     let queryString = `from: ${Util.getUniqueUsername(user)} `;
     const channel = Util.getCurrentChannel();
-    if (searchCurrent) {
+    if (searchCurrent && channel) {
         query.channel_id = [channel.id];
         queryString += `in:#${channel.name} `;
     }
