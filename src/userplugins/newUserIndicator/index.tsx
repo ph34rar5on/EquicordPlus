@@ -40,7 +40,7 @@ const checkUser = (user: User, indType: string) => {
 };
 
 const badge: ProfileBadge = {
-    component: u => checkUser(u.user, "badges"),
+    component: (u: { user: User; }) => checkUser(u.user, "badges"),
     position: BadgePosition.START,
     shouldShow: _ => true,
     key: "newuser-indicator"
@@ -74,7 +74,7 @@ export default definePlugin({
     name: "NewUserIndicator",
     description: "Adds an indicator that shows if a user's account has been created recently",
     authors: [
-        Devs.evergreen,
+        Devs.Ven,
     ],
     patches: [],
     settings,
