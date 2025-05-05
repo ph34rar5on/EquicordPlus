@@ -1,4 +1,4 @@
-# Equicord [<img src="./browser/icon.png" width="225" align="left" alt="Equicord">](https://github.com/Equicord/Equicord)
+# [<img src="./browser/icon.png" width="40" align="left" alt="Equicord">](https://github.com/Equicord/Equicord) Equicord
 
 [![Equibop](https://img.shields.io/badge/Equibop-grey?style=flat)](https://github.com/Equicord/Equibop)
 [![Tests](https://github.com/Equicord/Equicord/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Equicord/Equicord/actions/workflows/test.yml)
@@ -11,7 +11,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 ### Extra included plugins
 
 <details>
-<summary>171 additional plugins</summary>
+<summary>170 additional plugins</summary>
 
 ### All Platforms
 
@@ -53,7 +53,6 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - DontFilterMe by Samwich
 - EmojiDumper by Cortex, Samwich, Woosh
 - Encryptcord by Inbestigator
-- EquicordCSS by thororen, Panniku, Dablulite, Coolesding, MiniDiscordThemes, LuckFire, gold_me
 - EquicordHelper by thororen & nyx
 - Equissant by SomeAspy & thororen
 - ExportContacts by dat_insanity
@@ -144,7 +143,8 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - Signature by Ven, Rini, ImBanana, KrystalSkull
 - Slap by Korbo
 - SoundBoardLogger by Moxxie, fres, echo, maintained by thororen
-- - SplitLargeMessages by Reycko
+- SplitLargeMessages by Reycko
+- SpotifyActivityToggle by thororen
 - SpotifyLyrics by Joona
 - StatsfmPresence by Crxa
 - StatusPresets by iamme
