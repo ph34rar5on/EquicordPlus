@@ -11,7 +11,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 ### Extra included plugins
 
 <details>
-<summary>181 additional plugins</summary>
+<summary>183 additional plugins</summary>
 
 ### All Platforms
 
@@ -41,6 +41,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - CommandPalette by Ethan
 - CopyStickerLinks by Byeoon
 - CopyUserMention by Cortex & castdrian
+- CustomFolderIcons by sadan
 - CustomSounds by TheKodeToad & SpikeHD
 - CustomTimestamps by Rini & nvhrr
 - CustomUserColors by mochienya
@@ -105,10 +106,12 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - Meow by Samwich
 - MessageBurst by port
 - MessageColors by Hen
+- MessageFetchTimer by GroupXyz
 - MessageLinkTooltip by Kyuuhachi
 - MessageLoggerEnhanced by Aria
 - MessageTranslate by Samwich
 - ModalFade by Kyuuhachi
+- MoreCommands by Arjix, echo, Samu
 - MoreKaomoji by JacobTm & voidbbg
 - MoreStickers by Leko & Arjix
 - MoreUserTags by Cyn, TheSun, RyanCaoDev, LordElias, AutumnVN, hen
