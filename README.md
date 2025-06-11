@@ -11,7 +11,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 ### Extra included plugins
 
 <details>
-<summary>186 additional plugins</summary>
+<summary>187 additional plugins</summary>
 
 ### All Platforms
 
@@ -44,7 +44,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - CopyUserMention by Cortex & castdrian
 - CustomFolderIcons by sadan
 - CustomSounds by TheKodeToad & SpikeHD
-- CustomTimestamps by Rini & nvhrr
+- CustomTimestamps by Rini, nvhrr, Suffocate, Obsidian
 - CustomUserColors by mochienya
 - CuteAnimeBoys by ShadyGoat
 - CuteNekos by echo
@@ -167,6 +167,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - TeX by Kyuuhachi
 - TextToSpeech by Samwich
 - ThemeLibrary by Fafa
+- TidalEmbeds by vmohammad
 - Timezones by Aria
 - Title by Kyuuhachi
 - ToastNotifications by Skully, Ethan, Buzzy
