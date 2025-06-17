@@ -23,7 +23,7 @@ import { findStoreLazy } from "@webpack";
 import { Constants, FluxDispatcher, GuildStore, RelationshipStore, RestAPI, SnowflakeUtils, UserStore } from "@webpack/common";
 import { Settings } from "Vencord";
 
-const UserAffinitiesStore = findStoreLazy("UserAffinitiesStore");
+const UserAffinitiesStore = findStoreLazy("UserAffinitiesV2Store");
 
 export default definePlugin({
     name: "ImplicitRelationships",
@@ -140,7 +140,7 @@ export default definePlugin({
         // 2. Do not have a relationship with
         await this.refreshUserAffinities();
         const userAffinities: Set<string> = UserAffinitiesStore.getUserAffinitiesUserIds();
-        const relationships = RelationshipStore.getRelationships();
+        const relationships = RelationshipStore.getMutableRelationships();
         const nonFriendAffinities = Array.from(userAffinities).filter(
             id => !RelationshipStore.getRelationshipType(id)
         );

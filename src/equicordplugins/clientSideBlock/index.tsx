@@ -206,10 +206,10 @@ export default definePlugin({
         },
         // active now list
         {
-            find: "getUserAffinitiesUserIds(){",
+            find: "ACTIVE_NOW_COLUMN)",
             replacement: {
-                match: /return (\i.affinityUserIds)/,
-                replace: "return new Set(Array.from($1).filter(id => !$self.shouldHideUser(id)))"
+                match: /(\i\.\i),\{\}\)\]/,
+                replace: '"div",{children:$self.activeNowView($1())})]'
             }
         },
         // mutual friends list in user profile
@@ -220,5 +220,14 @@ export default definePlugin({
                 replace: "$1if($2 != undefined) return $2.filter(u => !$self.shouldHideUser(u.key))"
             }
         }
-    ]
+    ],
+    activeNowView(cards) {
+        if (!Array.isArray(cards)) return cards;
+
+        return cards.filter(card => {
+            if (!card?.key) return false;
+            const newKey = card.key.match(/(?:user-|party-spotify:)(.+)/)?.[1];
+            return this.shouldHideUser(newKey) ? null : card;
+        });
+    }
 });

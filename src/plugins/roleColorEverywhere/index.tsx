@@ -85,8 +85,8 @@ export default definePlugin({
             find: ".USER_MENTION)",
             replacement: [
                 {
-                    match: /(?<=onContextMenu:\i,color:)\i(?<=\.getNickname\((\i),\i,(\i).+?)/,
-                    replace: "$self.getColorInt($2?.id,$1)",
+                    match: /(?<=onContextMenu:\i(?!,children))(?<=\.getNickname\((\i),\i,(\i).+?)/,
+                    replace: ",color:$self.getColorInt($2?.id,$1)",
                 }
             ],
             predicate: () => settings.store.chatMentions
@@ -165,8 +165,10 @@ export default definePlugin({
 
     getColorString(userId: string, channelOrGuildId: string) {
         try {
-            if (Settings.plugins.CustomUserColors.enabled)
-                return getCustomColorString(userId, true);
+            if (Settings.plugins.CustomUserColors.enabled) {
+                const customColor = getCustomColorString(userId, true);
+                if (customColor) return customColor;
+            }
 
             const guildId = ChannelStore.getChannel(channelOrGuildId)?.guild_id ?? GuildStore.getGuild(channelOrGuildId)?.id;
             if (guildId == null) return null;

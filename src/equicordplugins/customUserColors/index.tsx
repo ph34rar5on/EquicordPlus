@@ -62,6 +62,7 @@ const userContextMenuPatch: NavContextMenuPatchCallback = (children, { user }: {
 };
 
 export function getCustomColorString(userId: string, withHash?: boolean): string | undefined {
+    if (!userId) return;
     if (!colors[userId] || !Settings.plugins.CustomUserColors.enabled) return;
     if (withHash) return `#${colors[userId]}`;
     return colors[userId];
@@ -95,7 +96,7 @@ export default definePlugin({
             find: '="SYSTEM_TAG"',
             replacement: {
                 // Override colorString with our custom color and disable gradients if applying the custom color.
-                match: /&&null!=\i\.secondaryColor,(?<=colorString:(\i).+?(\i)=.+?)/,
+                match: /useContext\(\i\.\i\),(?<=colorString:(\i).+?(\i)=.+?)/,
                 replace: (m, colorString, hasGradientColors) => `${m}` +
                     `vcCustomUserColorsDummy=[${colorString},${hasGradientColors}]=$self.getMessageColorsVariables(arguments[0],${hasGradientColors}),`
             },

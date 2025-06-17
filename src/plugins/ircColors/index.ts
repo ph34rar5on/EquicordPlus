@@ -68,7 +68,7 @@ export default definePlugin({
             find: '="SYSTEM_TAG"',
             replacement: {
                 // Override colorString with our custom color and disable gradients if applying the custom color.
-                match: /&&null!=\i\.secondaryColor,(?<=colorString:(\i).+?(\i)=.+?)/,
+                match: /useContext\(\i\.\i\),(?<=colorString:(\i).+?(\i)=.+?)/,
                 replace: (m, colorString, hasGradientColors) => `${m}` +
                     `vcIrcColorsDummy=[${colorString},${hasGradientColors}]=$self.getMessageColorsVariables(arguments[0],${hasGradientColors}),`
             }
@@ -109,13 +109,18 @@ export default definePlugin({
         const id = context?.user?.id;
         const colorString = context?.colorString;
         const color = calculateNameColorForUser(id);
-        const customColor = id && Settings.plugins.CustomUserColors.enabled ? getCustomColorString(id, true) : null;
 
-        if (
-            (settings.store.applyColorOnlyInDms && !context?.channel?.isPrivate()) ||
-            (settings.store.applyColorOnlyToUsersWithoutColor && colorString)
-        ) return customColor ?? colorString;
+        if (Settings.plugins.CustomUserColors.enabled) {
+            const customColor = getCustomColorString(id, true);
+            if (customColor) return customColor;
+        }
 
-        return customColor ?? color;
+        if (settings.store.applyColorOnlyInDms && !context?.channel?.isPrivate()) {
+            return colorString;
+        }
+
+        return (!settings.store.applyColorOnlyToUsersWithoutColor || !colorString)
+            ? color
+            : colorString;
     }
 });
