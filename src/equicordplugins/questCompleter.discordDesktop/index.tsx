@@ -20,13 +20,34 @@ import "@equicordplugins/_misc/styles.css";
 import "./style.css";
 
 import { showNotification } from "@api/Notifications";
+import { definePluginSettings } from "@api/Settings";
+import { ErrorBoundary } from "@components/index";
 import { Devs } from "@utils/constants";
 import { getTheme, Theme } from "@utils/discord";
-import definePlugin from "@utils/types";
+import definePlugin, { OptionType } from "@utils/types";
 import { findByProps, findComponentByCodeLazy } from "@webpack";
 import { Button, ChannelStore, FluxDispatcher, GuildChannelStore, NavigationRouter, RestAPI, Tooltip, UserStore } from "@webpack/common";
 
 const QuestIcon = findComponentByCodeLazy("10.47a.76.76");
+const HeaderBarIcon = findComponentByCodeLazy(".HEADER_BAR_BADGE_TOP:", '.iconBadge,"top"');
+
+let questIdCheck = 0;
+
+function ToolBarHeader() {
+    return (
+        <ErrorBoundary noop={true}>
+            <HeaderBarIcon
+                tooltip="Complete Quest"
+                position="bottom"
+                className="vc-quest-completer"
+                icon={QuestIcon}
+                onClick={openCompleteQuestUI}
+            >
+            </HeaderBarIcon>
+        </ErrorBoundary>
+    );
+}
+
 
 async function openCompleteQuestUI() {
     const ApplicationStreamingStore = findByProps("getStreamerActiveStreamMetadata");
@@ -50,13 +71,13 @@ async function openCompleteQuestUI() {
 
         const applicationId = quest.config.application.id;
         const applicationName = quest.config.application.name;
-        const taskName = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "PLAY_ACTIVITY"].find(x => quest.config.taskConfig.tasks[x] != null);
+        const taskName = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "PLAY_ACTIVITY", "WATCH_VIDEO_ON_MOBILE"].find(x => quest.config.taskConfig.tasks[x] != null);
         const icon = `https://cdn.discordapp.com/quests/${quest.id}/${theme}/${quest.config.assets.gameTile}`;
         // @ts-ignore
         const secondsNeeded = quest.config.taskConfig.tasks[taskName].target;
         // @ts-ignore
         let secondsDone = quest.userStatus?.progress?.[taskName]?.value ?? 0;
-        if (taskName === "WATCH_VIDEO") {
+        if (taskName === "WATCH_VIDEO" || taskName === "WATCH_VIDEO_ON_MOBILE") {
             const maxFuture = 10, speed = 7, interval = 1;
             const enrolledAt = new Date(quest.userStatus.enrolledAt).getTime();
             const fn = async () => {
@@ -213,19 +234,54 @@ async function openCompleteQuestUI() {
     }
 }
 
+const settings = definePluginSettings({
+    useNavBar: {
+        description: "Move quest button down to the server nav bar",
+        type: OptionType.BOOLEAN,
+        default: false,
+    }
+});
+
 export default definePlugin({
     name: "QuestCompleter",
     description: "A plugin to complete quests without having the game installed.",
     authors: [Devs.amia],
+    settings,
     patches: [
+        {
+            find: "BkZhUF)}",
+            replacement: {
+                match: /(?<=questId:(\i\.id).*?\.PRIMARY,)disabled:!0/,
+                replace: "onClick: () => $self.mobileQuestPatch($1)"
+            },
+        },
         {
             find: "AppTitleBar",
             replacement: {
                 match: /(?<=trailing:.{0,70}\(\i\.Fragment,{children:\[)/,
                 replace: "$self.renderQuestButton(),"
-            }
+            },
+            predicate: () => !settings.store.useNavBar
+        },
+        {
+            find: "toolbar:function",
+            replacement: {
+                match: /(function \i\(\i\){)(.{1,200}toolbar.{1,200}mobileToolbar)/,
+                replace: "$1$self.toolbarAction(arguments[0]);$2"
+            },
+            predicate: () => settings.store.useNavBar
         }
     ],
+    mobileQuestPatch(questId) {
+        if (questId === questIdCheck) return;
+        questIdCheck = questId;
+        Vencord.Webpack.Common.RestAPI.post({
+            url: `/quests/${questId}/enroll`,
+            body: {
+                location: 11
+            }
+        });
+    },
     renderQuestButton() {
         return (
             <Tooltip text="Complete Quest">
@@ -242,4 +298,19 @@ export default definePlugin({
             </Tooltip>
         );
     },
+    toolbarAction(e) {
+        if (Array.isArray(e.toolbar))
+            return e.toolbar.push(
+                <ErrorBoundary noop={true}>
+                    <ToolBarHeader />
+                </ErrorBoundary>
+            );
+
+        e.toolbar = [
+            <ErrorBoundary noop={true} key={"QuestCompleter"}>
+                <ToolBarHeader />
+            </ErrorBoundary>,
+            e.toolbar,
+        ];
+    }
 });
