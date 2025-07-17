@@ -6,11 +6,10 @@
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
-import { makeRange } from "@components/PluginSettings/components";
 import { Devs } from "@utils/constants";
-import definePlugin, { OptionType } from "@utils/types";
+import definePlugin, { makeRange, OptionType } from "@utils/types";
+import type { Channel } from "@vencord/discord-types";
 import { GuildChannelStore, Menu, React, RestAPI, UserStore, VoiceStateStore } from "@webpack/common";
-import type { Channel } from "discord-types/general";
 
 async function runSequential<T>(promises: Promise<T>[]): Promise<T[]> {
     const results: T[] = [];

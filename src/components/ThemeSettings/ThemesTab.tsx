@@ -24,10 +24,7 @@ import { ErrorCard } from "@components/ErrorCard";
 import { Flex } from "@components/Flex";
 import { CogWheel, DeleteIcon, FolderIcon, PaintbrushIcon, PencilIcon, PluginIcon, PlusIcon, RestartIcon } from "@components/Icons";
 import { Link } from "@components/Link";
-import { openPluginModal } from "@components/PluginSettings/PluginModal";
-import { AddonCard } from "@components/VencordSettings/AddonCard";
-import { QuickAction, QuickActionCard } from "@components/VencordSettings/quickActions";
-import { SettingsTab, wrapTab } from "@components/VencordSettings/shared";
+import { AddonCard, openPluginModal, QuickAction, QuickActionCard, SettingsTab, wrapTab } from "@components/settings";
 import { CspBlockedUrls, useCspErrors } from "@utils/cspViolations";
 import { openInviteModal } from "@utils/discord";
 import { Margins } from "@utils/margins";
@@ -448,7 +445,7 @@ function ThemesTab() {
 
     function OnlineThemes() {
         return (
-            <>
+            <>;
                 <Forms.FormSection title="Online Themes" tag="h5">
                     <Card className="vc-settings-theme-add-card">
                         <Forms.FormText>Make sure to use direct links to files (raw or github.io)!</Forms.FormText>

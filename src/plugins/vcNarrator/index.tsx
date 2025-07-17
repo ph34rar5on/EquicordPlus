@@ -17,7 +17,7 @@
 */
 
 import { ErrorCard } from "@components/ErrorCard";
-import { Devs } from "@utils/constants";
+import { Devs, IS_LINUX } from "@utils/constants";
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
 import { wordsToTitle } from "@utils/text";
@@ -41,8 +41,10 @@ interface VoiceState {
 // Filtering out events is not as simple as just dropping duplicates, as otherwise mute, unmute, mute would
 // not say the second mute, which would lead you to believe they're unmuted
 
-function speak(text: string, { volume, rate } = settings.store) {
+function speak(text: string) {
     if (!text) return;
+
+    const { volume, rate } = settings.store;
 
     const speech = new SpeechSynthesisUtterance(text);
     const voice = getCurrentVoice();
@@ -90,12 +92,48 @@ function getTypeAndChannelId({ channelId, oldChannelId }: VoiceState, isMe: bool
     return ["", ""];
 }
 
-function playSample(tempSettings: any, type: string) {
-    const s = Object.assign({}, settings.plain, tempSettings);
+/*
+function updateStatuses(type: string, { deaf, mute, selfDeaf, selfMute, userId, channelId }: VoiceState, isMe: boolean) {
+    if (isMe && (type === "join" || type === "move")) {
+        StatusMap = {};
+        const states = VoiceStateStore.getVoiceStatesForChannel(channelId!) as Record<string, VoiceState>;
+        for (const userId in states) {
+            const s = states[userId];
+            StatusMap[userId] = {
+                mute: s.mute || s.selfMute,
+                deaf: s.deaf || s.selfDeaf
+            };
+        }
+        return;
+    }
+
+    if (type === "leave" || (type === "move" && channelId !== SelectedChannelStore.getVoiceChannelId())) {
+        if (isMe)
+            StatusMap = {};
+        else
+            delete StatusMap[userId];
+
+        return;
+    }
+
+    StatusMap[userId] = {
+        deaf: deaf || selfDeaf,
+        mute: mute || selfMute
+    };
+}
+*/
+
+function playSample(type: string) {
     const currentUser = UserStore.getCurrentUser();
     const myGuildId = SelectedGuildStore.getGuildId();
 
-    speak(formatText(s[type + "Message"], currentUser.username, "general", (currentUser as any).globalName ?? currentUser.username, GuildMemberStore.getNick(myGuildId, currentUser.id) ?? currentUser.username), s);
+    speak(formatText(
+        settings.store[type + "Message"],
+        currentUser.username,
+        "general",
+        currentUser.globalName ?? currentUser.username,
+        GuildMemberStore.getNick(myGuildId!, currentUser.id) ?? currentUser.username
+    ));
 }
 
 export default definePlugin({
@@ -128,7 +166,7 @@ export default definePlugin({
                 const template = settings.store[type + "Message"];
                 const user = isMe && !settings.store.sayOwnName ? "" : UserStore.getUser(userId).username;
                 const displayName = user && ((UserStore.getUser(userId) as any).globalName ?? user);
-                const nickname = user && (GuildMemberStore.getNick(myGuildId, userId) ?? user);
+                const nickname = user && (GuildMemberStore.getNick(myGuildId!, userId) ?? user);
                 const channel = ChannelStore.getChannel(id).name;
 
                 speak(formatText(template, user, channel, displayName, nickname));
@@ -166,7 +204,7 @@ export default definePlugin({
 
     },
 
-    settingsAboutComponent({ tempSettings: s }) {
+    settingsAboutComponent() {
         const [hasVoices, hasEnglishVoices] = useMemo(() => {
             const voices = speechSynthesis.getVoices();
             return [voices.length !== 0, voices.some(v => v.lang.startsWith("en"))];
@@ -180,7 +218,7 @@ export default definePlugin({
         let errorComponent: ReactElement<any> | null = null;
         if (!hasVoices) {
             let error = "No narrator voices found. ";
-            error += navigator.platform?.toLowerCase().includes("linux")
+            error += IS_LINUX
                 ? "Install speech-dispatcher or espeak and run Discord with the --enable-speech-dispatcher flag"
                 : "Try installing some in the Narrator settings of your Operating System";
             errorComponent = <ErrorCard>{error}</ErrorCard>;
@@ -209,7 +247,7 @@ export default definePlugin({
                             className={"vc-narrator-buttons"}
                         >
                             {types.map(t => (
-                                <Button key={t} onClick={() => playSample(s, t)}>
+                                <Button key={t} onClick={() => playSample(t)}>
                                     {wordsToTitle([t])}
                                 </Button>
                             ))}

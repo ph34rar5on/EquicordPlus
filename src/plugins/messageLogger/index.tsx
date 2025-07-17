@@ -19,9 +19,9 @@ import { getIntlMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { classes } from "@utils/misc";
 import definePlugin, { OptionType } from "@utils/types";
+import { Message } from "@vencord/discord-types";
 import { findByPropsLazy } from "@webpack";
 import { ChannelStore, FluxDispatcher, Menu, MessageStore, Parser, SelectedChannelStore, Timestamp, UserStore, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 
 import overlayStyle from "./deleteStyleOverlay.css?managed";
 import textStyle from "./deleteStyleText.css?managed";
@@ -74,11 +74,19 @@ const patchMessageContextMenu: NavContextMenuPatchCallback = (
         );
     }
 
+    let label;
+
+    if (!Vencord.Plugins.isPluginEnabled("MessageLoggerEnhanced")) {
+        label = "Remove Message History";
+    } else {
+        label = "Remove Message (Temporary)";
+    }
+
     children.push(
         <Menu.MenuItem
             id={REMOVE_HISTORY_ID}
             key={REMOVE_HISTORY_ID}
-            label="Remove Message History"
+            label={label}
             color="danger"
             action={() => {
                 if (deleted) {

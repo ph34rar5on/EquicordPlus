@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { addChatBarButton, ChatBarButton, ChatBarButtonFactory, removeChatBarButton } from "@api/ChatButtons";
+import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import {
     ApplicationCommandInputType,
     ApplicationCommandOptionType,
@@ -15,6 +15,7 @@ import { addMessagePreSendListener, MessageSendListener, removeMessagePreSendLis
 import { Devs, EquicordDevs } from "@utils/constants";
 import { sleep } from "@utils/misc";
 import definePlugin from "@utils/types";
+import { Message } from "@vencord/discord-types";
 import {
     ChannelActionCreators,
     FluxDispatcher, MessageActions, RestAPI,
@@ -22,7 +23,6 @@ import {
     useEffect, UserStore,
     UserUtils, useState,
 } from "@webpack/common";
-import { Message } from "discord-types/general";
 const CloudUpload = findLazy(m => m.prototype?.trackUploadFinished);
 
 import { getCurrentChannel } from "@utils/discord";
@@ -150,6 +150,7 @@ export default definePlugin({
             }
         }
     ],
+    renderChatBarButton: ChatBarIcon,
     async interactionHandler(interaction) {
         const sender = await UserUtils.getUser(interaction.application_id).catch(() => null);
         if (!sender || (sender.bot === true && sender.id !== "1")) return;
@@ -260,7 +261,6 @@ export default definePlugin({
         },
     ],
     async start() {
-        addChatBarButton("Encryptcord", ChatBarIcon);
         const pair = await generateKeys();
         await DataStore.set("encryptcordPublicKey", pair.publicKey);
         await DataStore.set("encryptcordPrivateKey", pair.privateKey);
@@ -272,7 +272,6 @@ export default definePlugin({
         await DataStore.set("encryptcordGroupMembers", {});
     },
     async stop() {
-        removeChatBarButton("Encryptcord");
         if (await DataStore.get("encryptcordGroup") === true) {
             await leave("", { channel: { id: await DataStore.get("encryptcordChannelId") } });
         }

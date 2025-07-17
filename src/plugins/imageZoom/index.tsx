@@ -18,11 +18,10 @@
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { definePluginSettings } from "@api/Settings";
-import { makeRange } from "@components/PluginSettings/components";
 import { debounce } from "@shared/debounce";
 import { Devs, EquicordDevs } from "@utils/constants";
 import { Logger } from "@utils/Logger";
-import definePlugin, { OptionType } from "@utils/types";
+import definePlugin, { makeRange, OptionType } from "@utils/types";
 import { createRoot, Menu } from "@webpack/common";
 import { JSX } from "react";
 import type { Root } from "react-dom/client";
@@ -314,13 +313,9 @@ export default definePlugin({
                     replace: `id:"${ELEMENT_ID}",$&`
                 },
                 {
-                    match: /\.zoomed]:.+?,(?=children:)/,
-                    replace: "$&onClick:()=>{},"
-                },
-                {
-                    match: /className:\i\(\)\(\i\.wrapper,.+?}\),/,
-                    replace: ""
-                },
+                    match: /(?<=null!=(\i)\?.{0,20})\i\.\i,{children:\1/,
+                    replace: "'div',{onClick:e=>e.stopPropagation(),children:$1"
+                }
             ]
         },
         {

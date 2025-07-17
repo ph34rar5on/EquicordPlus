@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { makeDummyUser } from "@components/PluginSettings/PluginModal";
+import { makeDummyUser } from "@components/settings/tabs/plugins/PluginModal";
+import { Channel, Message } from "@vencord/discord-types";
 import { ChannelStore, lodash, Toasts, UserStore } from "@webpack/common";
-import { Channel, Message } from "discord-types/general";
 
 import { Discord, HolyNotes } from "./types";
 import { deleteCacheFromDataStore, DeleteEntireStore, saveCacheToDataStore } from "./utils";

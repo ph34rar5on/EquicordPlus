@@ -2,16 +2,16 @@
 
 [![Equibop](https://img.shields.io/badge/Equibop-grey?style=flat)](https://github.com/Equicord/Equibop)
 [![Tests](https://github.com/Equicord/Equicord/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Equicord/Equicord/actions/workflows/test.yml)
-[![Discord](https://img.shields.io/discord/1173279886065029291.svg?color=768AD4&label=Discord&logo=discord&logoColor=white)](https://discord.gg/5Xh2W87egW)
+[![Discord](https://img.shields.io/discord/1173279886065029291.svg?color=768AD4&label=Discord&logo=discord&logoColor=white)](https://discord.gg/equicord-1173279886065029291)
 
 Equicord is a fork of [Vencord](https://github.com/Vendicated/Vencord), with over 300+ plugins.
 
-You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, changes, chat or even support.
+You can join our [discord server](https://discord.gg/equicord-1173279886065029291) for commits, changes, chat or even support.
 
 ### Extra included plugins
 
 <details>
-<summary>193 additional plugins</summary>
+<summary>195 additional plugins</summary>
 
 ### All Platforms
 
@@ -53,6 +53,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - DecodeBase64 by ThePirateStoner
 - Demonstration by Samwich
 - DisableAnimations by S€th
+- DiscordDevBanner by KrystalSkull
 - DisableCameras by Joona
 - DontFilterMe by Samwich
 - Encryptcord by Inbestigator
@@ -82,7 +83,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - GitHubRepos by talhakf
 - Glide by Samwich
 - GlobalBadges by HypedDomi & Hosted by Wolfie
-- GoogleThat by Samwich
+- GoogleThat by Samwich & KrystalSkull
 - GuildPickerDumper by Cortex, Samwich, Synth, thororen
 - GuildTagSettings by thororen
 - HideChatButtons by iamme
@@ -141,6 +142,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - PlatformSpoofer by Drag
 - PolishWording by Samwich
 - PurgeMessages by bhop & nyx
+- QuestFocused by secp192k1
 - QuestionMarkReplacement by nyx
 - Quoter by Samwich
 - RandomVoice by xijexo, omaw, thororen
@@ -150,6 +152,7 @@ You can join our [discord server](https://discord.gg/5Xh2W87egW) for commits, ch
 - ReplyPingControl by ant0n & MrDiamond
 - RPCEditor by Nyako & nin0dev
 - RPCStats by Samwich
+- SaveFavoriteGIFs by thororen
 - SearchFix by Jaxx
 - SekaiStickers by MaiKokain
 - ServerSearch by camila314
