@@ -32,13 +32,12 @@ const genTagTypes = () => {
     return obj;
 };
 
-migratePluginSettings("ExpandedUserTags", "MoreUserTags");
+migratePluginSettings("MoreUserTags", "ExpandedUserTags");
 export default definePlugin({
-    name: "ExpandedUserTags",
+    name: "MoreUserTags",
     description: "Adds tags for webhooks and moderative roles (owner, admin, etc.)",
     authors: [Devs.Cyn, Devs.TheSun, Devs.RyanCaoDev, Devs.LordElias, Devs.AutumnVN, EquicordDevs.Hen],
     dependencies: ["MemberListDecoratorsAPI", "NicknameIconsAPI", "MessageDecorationsAPI"],
-    tags: ["MoreUserTags"],
     settings,
     patches: [
         // Make discord actually use our tags

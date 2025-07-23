@@ -13,8 +13,18 @@ import { Tag, tags } from "./consts";
 import { TagSettings } from "./types";
 
 function SettingsComponent() {
+    if (!settings.store.tagSettings) {
+        settings.store.tagSettings = {} as TagSettings;
+    }
+
     const tagSettings = settings.store.tagSettings as TagSettings;
-    const { localTags } = Vencord.Plugins.plugins.ExpandedUserTags as any;
+    const { localTags } = Vencord.Plugins.plugins.MoreUserTags as any;
+
+    tags.forEach(t => {
+        if (!tagSettings[t.name]) {
+            tagSettings[t.name] = { text: t.displayName, showInChat: true, showInNotChat: true };
+        }
+    });
 
     return (
         <Flex flexDirection="column">
