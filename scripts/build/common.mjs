@@ -319,6 +319,83 @@ const styleModule = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "
 /**
  * @type {import("esbuild").Plugin}
  */
+export const pathAliasPlugin = {
+    name: "path-alias-plugin",
+    setup: build => {
+        const aliases = {
+            "@vencord/discord-types": join(dirname(fileURLToPath(import.meta.url)), "../../packages/discord-types"),
+            "@api": join(dirname(fileURLToPath(import.meta.url)), "../../src/api"),
+            "@components": join(dirname(fileURLToPath(import.meta.url)), "../../src/components"),
+            "@utils": join(dirname(fileURLToPath(import.meta.url)), "../../src/utils"),
+            "@webpack/common": join(dirname(fileURLToPath(import.meta.url)), "../../src/webpack/common"),
+            "@webpack/patcher": join(dirname(fileURLToPath(import.meta.url)), "../../src/webpack/patchWebpack"),
+            "@webpack/wreq.d": join(dirname(fileURLToPath(import.meta.url)), "../../src/webpack/wreq.d"),
+            "@webpack": join(dirname(fileURLToPath(import.meta.url)), "../../src/webpack/webpack"),
+            "@plugins": join(dirname(fileURLToPath(import.meta.url)), "../../src/plugins"),
+            "@equicordplugins": join(dirname(fileURLToPath(import.meta.url)), "../../src/equicordplugins")
+        };
+
+        build.onResolve({ filter: /^@/ }, async args => {
+            // Find the longest matching alias
+            let bestMatch = "";
+            let bestAlias = "";
+            
+            for (const [alias, resolvedPath] of Object.entries(aliases)) {
+                if (args.path.startsWith(alias) && alias.length > bestMatch.length) {
+                    bestMatch = alias;
+                    bestAlias = resolvedPath;
+                }
+            }
+            
+            if (bestMatch) {
+                const remainingPath = args.path.slice(bestMatch.length);
+                let resolvedPath = join(bestAlias, remainingPath);
+                
+                // Normalize path separators
+                resolvedPath = resolvedPath.replace(/\\/g, '/');
+                
+                // Check if the path already has an extension
+                if (resolvedPath.match(/\.[a-z]+$/)) {
+                    // If it has an extension, try different extensions
+                    const basePathWithoutExt = resolvedPath.replace(/\.[a-z]+$/, '');
+                    const extensions = ['.ts', '.tsx', '.js', '.jsx'];
+                    
+                    for (const ext of extensions) {
+                        const pathWithExt = basePathWithoutExt + ext;
+                        if (await exists(pathWithExt)) {
+                            return {
+                                path: pathWithExt
+                            };
+                        }
+                    }
+                } else {
+                    // Try to resolve with common extensions
+                    const extensions = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx', '/index.js', '/index.jsx'];
+                    
+                    for (const ext of extensions) {
+                        const pathWithExt = resolvedPath + ext;
+                        if (await exists(pathWithExt)) {
+                            return {
+                                path: pathWithExt
+                            };
+                        }
+                    }
+                }
+                
+                // If no extension worked, return the original path and let esbuild handle it
+                return {
+                    path: resolvedPath
+                };
+            }
+            
+            return null;
+        });
+    }
+};
+
+/**
+ * @type {import("esbuild").Plugin}
+ */
 export const stylePlugin = {
     name: "style-plugin",
     setup: ({ onResolve, onLoad }) => {
@@ -350,7 +427,7 @@ export const commonOpts = {
     sourcemap: watch ? "inline" : "external",
     legalComments: "linked",
     banner,
-    plugins: [fileUrlPlugin, gitHashPlugin, gitRemotePlugin, stylePlugin],
+    plugins: [fileUrlPlugin, gitHashPlugin, gitRemotePlugin, pathAliasPlugin, stylePlugin],
     external: ["~plugins", "~git-hash", "~git-remote", "/assets/*"],
     inject: [join(dirname(fileURLToPath(import.meta.url)), "inject/react.mjs")],
     jsx: "transform",

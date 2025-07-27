@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Switch } from "@components/Switch";
+import { Switch } from "@components/settings/Switch";
 import { Card, Forms } from "@webpack/common";
 import React from "react";
 
