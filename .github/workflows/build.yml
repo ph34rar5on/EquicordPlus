@@ -1,8 +1,6 @@
 name: Release
 on:
     push:
-        tags:
-            - v*
         branches:
             - main
 env:
@@ -30,7 +28,7 @@ jobs:
                   cache: "pnpm"
 
             - name: Install dependencies
-              run: pnpm install --no-frozen-lockfile
+              run: pnpm install --frozen-lockfile
 
             - name: Build web
               run: pnpm buildWebStandalone
