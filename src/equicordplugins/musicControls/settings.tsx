@@ -6,13 +6,12 @@
 
 import { definePluginSettings } from "@api/Settings";
 import { disableStyle, enableStyle } from "@api/Styles";
-import { useAwaiter } from "@utils/react";
 import { makeRange, OptionType } from "@utils/types";
-import { Button, Forms, MaskedLink, showToast, Text, Toasts, useMemo } from "@webpack/common";
+import { Button, Forms, MaskedLink, showToast, Toasts } from "@webpack/common";
 
 import hoverOnlyStyle from "./hoverOnly.css?managed";
-import { clearLyricsCache, getLyricsCount } from "./spotify/lyrics/api";
-import { useLyrics } from "./spotify/lyrics/components/util";
+import { clearLyricsCache, removeTranslations } from "./spotify/lyrics/api";
+import languages from "./spotify/lyrics/providers/translator/languages";
 import { Provider } from "./spotify/lyrics/providers/types";
 
 const sliderOptions = {
@@ -23,26 +22,6 @@ const sliderOptions = {
 export function toggleHoverControls(value: boolean) {
     (value ? enableStyle : disableStyle)(hoverOnlyStyle);
 }
-
-function Details() {
-    const { lyricsInfo } = useLyrics();
-
-    const [count, error, loading] = useAwaiter(
-        useMemo(() => getLyricsCount, []),
-        {
-            onError: () => console.error("Failed to get lyrics count"),
-            fallbackValue: null,
-        }
-    );
-
-    return (
-        <>
-            <Text>Current lyrics provider: {lyricsInfo?.useLyric || "None"}</Text>
-            {loading ? <Text>Loading lyrics count...</Text> : error ? <Text>Failed to get lyrics count</Text> : <Text>Lyrics count: {count}</Text>}
-        </>
-    );
-}
-
 
 function InstallInstructions() {
     return (
@@ -82,6 +61,15 @@ export const settings = definePluginSettings({
             { value: Provider.Spotify, label: "Spotify (Musixmatch)", default: true },
             { value: Provider.Lrclib, label: "LRCLIB" },
         ],
+    },
+    TranslateTo: {
+        description: "Translate lyrics to - Changing this will clear existing translations",
+        type: OptionType.SELECT,
+        options: languages,
+        onChange: async () => {
+            await removeTranslations();
+            showToast("Translations cleared", Toasts.Type.SUCCESS);
+        }
     },
     LyricsConversion: {
         description: "Automatically translate or romanize lyrics",
