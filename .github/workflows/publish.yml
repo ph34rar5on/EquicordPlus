@@ -20,7 +20,7 @@ jobs:
       - name: Get latest Git tag
         id: tag
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n 1 || echo "v0.0.0")
           echo "latest=$latest_tag" >> $GITHUB_OUTPUT
 
       - name: Check if package.json version is newer
@@ -36,6 +36,7 @@ jobs:
             echo "release=true" >> $GITHUB_OUTPUT
           else
             echo "release=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Stop if not newer
         if: steps.check.outputs.release == 'false'
@@ -44,27 +45,34 @@ jobs:
           exit 0
 
       - name: Create Tag
+        if: steps.check.outputs.release == 'true'
         uses: butlerlogic/action-autotag@1.1.2
         env:
             GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
             tag_prefix: "v"
 
-      - uses: pnpm/action-setup@v3
+      - name: Setup PNPM
+        if: steps.check.outputs.release == 'true'
+        uses: pnpm/action-setup@v3
 
       - name: Use Node.js 20
+        if: steps.check.outputs.release == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
 
       - name: Install dependencies
+        if: steps.check.outputs.release == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build web
+        if: steps.check.outputs.release == 'true'
         run: pnpm buildWebStandalone
 
       - name: Publish extension
+        if: steps.check.outputs.release == 'true'
         run: |
           cd dist/browser/chromium-unpacked
           pnpx chrome-webstore-upload-cli@2.1.0 upload --auto-publish
