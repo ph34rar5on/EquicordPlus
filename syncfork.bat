@@ -7,7 +7,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo 🔀 Merging upstream/dev...
-git merge upstream/dev
+git merge upstream/dev --no-edit
 if %ERRORLEVEL% neq 0 (
     echo ❌ Failed to merge upstream/dev
     exit /b 1

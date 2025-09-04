@@ -22,7 +22,7 @@ function Sync-Fork {
     }
     
     Write-Host "🔀 Merging upstream/dev..." -ForegroundColor Yellow
-    git merge upstream/dev
+    git merge upstream/dev --no-edit
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Failed to merge upstream/dev" -ForegroundColor Red
