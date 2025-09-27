@@ -22,7 +22,14 @@ function Sync-Fork {
     }
     
     Write-Host "🔀 Merging upstream/dev..." -ForegroundColor Yellow
-    git merge upstream/dev --no-edit
+    
+    # Set multiple environment variables to ensure no editor opens
+    $env:GIT_EDITOR = "true"
+    $env:EDITOR = "true"
+    $env:VISUAL = "true"
+    
+    # Use git with explicit config and multiple flags to avoid editor
+    & git -c core.editor=true -c sequence.editor=true merge upstream/dev --no-edit --no-ff
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Failed to merge upstream/dev" -ForegroundColor Red
