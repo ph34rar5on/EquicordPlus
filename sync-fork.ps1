@@ -29,7 +29,7 @@ function Sync-Fork {
     $env:VISUAL = "true"
     
     # Use git with explicit config and multiple flags to avoid editor
-    & git -c core.editor=true -c sequence.editor=true merge upstream/dev --no-edit --no-ff
+    & git -c core.editor=true -c sequence.editor=true merge upstream/dev --no-edit --no-ff -m "Merge remote-tracking branch 'upstream/dev'"
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Failed to merge upstream/dev" -ForegroundColor Red

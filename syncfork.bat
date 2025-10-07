@@ -7,7 +7,10 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo 🔀 Merging upstream/dev...
-git merge upstream/dev --no-edit
+set GIT_EDITOR=true
+set EDITOR=true
+set VISUAL=true
+git -c core.editor=true merge upstream/dev --no-edit --no-ff -m "Merge remote-tracking branch 'upstream/dev'"
 if %ERRORLEVEL% neq 0 (
     echo ❌ Failed to merge upstream/dev
     exit /b 1
