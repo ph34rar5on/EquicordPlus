@@ -48,6 +48,3 @@ function Sync-Fork {
 
 # Create an alias for shorter usage
 Set-Alias -Name syncfork -Value Sync-Fork
-
-# Run the sync function
-Sync-Fork
