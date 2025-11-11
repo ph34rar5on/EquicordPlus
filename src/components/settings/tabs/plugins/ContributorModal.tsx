@@ -19,12 +19,14 @@ import { ModalContent, ModalRoot, openModal } from "@utils/modal";
 import { User } from "@vencord/discord-types";
 import { showToast, useEffect, useMemo, UserProfileStore, useStateFromStores } from "@webpack/common";
 
-import Plugins from "~plugins";
+import Plugins, { PluginMeta } from "~plugins";
 
 import { GithubButton, WebsiteButton } from "./LinkIconButton";
 import { PluginCard } from "./PluginCard";
 
 const cl = classNameFactory("vc-author-modal-");
+
+type PluginFilter = "all" | "equicord" | "vencord" | "modified" | "user";
 
 export function openContributorModal(user: User) {
     openModal(modalProps =>
@@ -53,9 +55,12 @@ function ContributorModal({ user }: { user: User; }) {
 
     const plugins = useMemo(() => {
         const allPlugins = Object.values(Plugins);
-        const pluginsByAuthor = VencordDevsById[user.id] || EquicordDevsById[user.id]
+        const pluginsByAuthor = (VencordDevsById[user.id] || EquicordDevsById[user.id])
             ? allPlugins.filter(p => p.authors.includes(VencordDevsById[user.id] || EquicordDevsById[user.id]))
-            : allPlugins.filter(p => p.authors.some(a => a.name === user.username));
+            : allPlugins.filter(p =>
+                PluginMeta[p.name]?.userPlugin && p.authors.some(a => a.id.toString() === user.id)
+                || p.authors.some(a => a.name === user.username)
+            );
 
         return pluginsByAuthor
             .filter(p => !p.name.endsWith("API"))
