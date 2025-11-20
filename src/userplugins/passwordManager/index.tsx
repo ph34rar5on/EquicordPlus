@@ -10,7 +10,7 @@ import { DataStore } from "@api/index";
 import { EquicordDevs } from "@utils/constants";
 import * as Modal from "@utils/modal";
 import definePlugin from "@utils/types";
-import { Button, Flex, React, Text, TextInput } from "@webpack/common";
+import { Button, Flux, React, Text, TextInput } from "@webpack/common";
 
 interface PasswordEntry {
     id: string;
