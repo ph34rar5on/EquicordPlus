@@ -31,7 +31,7 @@ let LayoutTypes = {
     PANEL: 3,
     PANE: 4
 };
-waitFor(["SECTION", "SIDEBAR_ITEM", "PANEL", "PANE"], v => LayoutTypes = v);
+waitFor(["SECTION", "SIDEBAR_ITEM", "PANEL"], v => LayoutTypes = v);
 
 const FallbackSectionTypes = {
     HEADER: "HEADER",
@@ -52,11 +52,13 @@ interface SettingsLayoutNode {
     type: number;
     key?: string;
     legacySearchKey?: string;
+    getLegacySearchKey?(): string;
     useLabel?(): string;
     useTitle?(): string;
     buildLayout?(): SettingsLayoutNode[];
     icon?(): ReactNode;
     render?(): ReactNode;
+    StronglyDiscouragedCustomComponent?(): ReactNode;
 }
 
 interface EntryOptions {
@@ -172,28 +174,43 @@ export default definePlugin({
     buildEntry(options: EntryOptions): SettingsLayoutNode {
         const { key, title, panelTitle = title, Component, Icon } = options;
 
+        const panel: SettingsLayoutNode = {
+            key: key + "_panel",
+            type: LayoutTypes.PANEL,
+            useTitle: () => panelTitle,
+        };
+
+        const render = {
+            // FIXME
+            StronglyDiscouragedCustomComponent: () => <Component />,
+            render: () => <Component />,
+        };
+
+        // FIXME
+        if (LayoutTypes.PANE) {
+            panel.buildLayout = () => [
+                {
+                    key: key + "_pane",
+                    type: LayoutTypes.PANE,
+                    useTitle: () => panelTitle,
+                    buildLayout: () => [],
+                    ...render
+                }
+            ];
+        } else {
+            Object.assign(panel, render);
+            panel.buildLayout = () => [];
+        }
+
         return ({
             key,
             type: LayoutTypes.SIDEBAR_ITEM,
+            // FIXME
             legacySearchKey: title.toUpperCase(),
+            getLegacySearchKey: () => title.toUpperCase(),
             useTitle: () => title,
             icon: () => <Icon width={20} height={20} />,
-            buildLayout: () => [
-                {
-                    key: key + "_panel",
-                    type: LayoutTypes.PANEL,
-                    useTitle: () => panelTitle,
-                    buildLayout: () => [
-                        {
-                            key: key + "_pane",
-                            type: LayoutTypes.PANE,
-                            buildLayout: () => [],
-                            render: () => <Component />,
-                            useTitle: () => panelTitle
-                        }
-                    ]
-                }
-            ]
+            buildLayout: () => [panel]
         });
     },
 
@@ -207,7 +224,7 @@ export default definePlugin({
             ["EquicordCloud", "equicord_cloud_panel"],
             ["EquicordBackupAndRestore", "equicord_backup_restore_panel"],
             ["EquicordPatchHelper", "equicord_patch_helper_panel"],
-            ["Equibop", "EquibopSettings", "equicord_equibop_settings_panel"],
+            ["EquibopSettings", "equicord_equibop_settings_panel"],
             ["EquicordDiscordIcons", "equicord_icon_viewer"],
             ["EquicordThemeLibrary", "equicord_theme_library"],
             ["EquicordIRememberYou", "equicord_i_remember_you"],
