@@ -21,7 +21,6 @@ import "./styles.css";
 import * as DataStore from "@api/DataStore";
 import { isPluginEnabled, stopPlugin } from "@api/PluginManager";
 import { useSettings } from "@api/Settings";
-import { classNameFactory } from "@api/Styles";
 import { Button } from "@components/Button";
 import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
@@ -31,6 +30,7 @@ import { Paragraph } from "@components/Paragraph";
 import { SettingsTab } from "@components/settings";
 import { debounce } from "@shared/debounce";
 import { ChangeList } from "@utils/ChangeList";
+import { classNameFactory } from "@utils/css";
 import { isTruthy } from "@utils/guards";
 import { Logger } from "@utils/Logger";
 import { Margins } from "@utils/margins";
@@ -86,7 +86,7 @@ function ReloadRequiredCard({ required, enabledPlugins, openWarningModal, resetC
                     size="small"
                     className={"vc-plugins-disable-warning vc-modal-align-reset"}
                     onClick={() => {
-                        return openWarningModal(null, null, null, false, enabledPlugins.length, resetCheckAndDo);
+                        return openWarningModal(null, undefined, false, enabledPlugins.length, resetCheckAndDo);
                     }}
                 >
                     Disable All Plugins

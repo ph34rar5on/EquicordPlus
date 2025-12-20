@@ -20,7 +20,6 @@ import "./themesStyles.css";
 
 import { isPluginEnabled } from "@api/PluginManager";
 import { Settings, useSettings } from "@api/Settings";
-import { classNameFactory } from "@api/Styles";
 import { Alert } from "@components/Alert";
 import { Button } from "@components/Button";
 import { Divider } from "@components/Divider";
@@ -34,6 +33,7 @@ import { Paragraph } from "@components/Paragraph";
 import { AddonCard, openPluginModal, QuickAction, QuickActionCard, SettingsTab, wrapTab } from "@components/settings";
 import { OnlineThemeCard } from "@components/settings/OnlineThemeCard";
 import { CspBlockedUrls, useCspErrors } from "@utils/cspViolations";
+import { classNameFactory } from "@utils/css";
 import { copyWithToast, openInviteModal } from "@utils/discord";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
@@ -381,7 +381,7 @@ function ThemesTab() {
     const [themeNames, setThemeNames] = useState<Record<string, string>>(() => {
         return settings.themeNames ?? {};
     });
-    const [themeDir, , themeDirPending] = useAwaiter(VencordNative.themes.getThemesDir);
+    const [themeDir] = useAwaiter(VencordNative.themes.getThemesDir);
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState(ThemeFilter.All);
 
@@ -686,8 +686,7 @@ function ThemesTab() {
                 ) : (
                     <QuickAction
                         text="Open Themes Folder"
-                        action={() => showItemInFolder(themeDir!)}
-                        disabled={themeDirPending}
+                        action={() => VencordNative.themes.openFolder()}
                         Icon={FolderIcon}
                     />
                 )}
