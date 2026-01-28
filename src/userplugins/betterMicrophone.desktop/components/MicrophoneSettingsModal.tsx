@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Card } from "@components/Card";
 import { Flex } from "@components/Flex";
 import { Switch } from "@components/Switch";
 import { ModalSize } from "@utils/modal";
-import { Card, Forms, Select, Slider, TextInput, useEffect, useState } from "@webpack/common";
+import { Forms, Select, Slider, TextInput, useEffect, useState } from "@webpack/common";
 import { SelectOption } from "@webpack/types";
 
 import {

@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Card } from "@components/Card";
 import { Switch } from "@components/Switch";
-import { Card, Forms } from "@webpack/common";
+import { Forms } from "@webpack/common";
 import React from "react";
 
 export interface SettingsModalItemProps extends Pick<React.ComponentProps<"div">,

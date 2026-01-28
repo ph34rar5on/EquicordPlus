@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Card } from "@components/Card";
 import { Flex } from "@components/Flex";
 import { Switch } from "@components/Switch";
 import { ModalSize, openModalLazy } from "@utils/modal";
-import { Button, Card, Forms, React, Select, Slider, TextInput, useEffect, useState } from "@webpack/common";
+import { Button, Forms, React, Select, Slider, TextInput, useEffect, useState } from "@webpack/common";
 import { SelectOption } from "@webpack/types";
 
 import { MicrophoneSettingsModal } from "../../betterMicrophone.desktop/components";
