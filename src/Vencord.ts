@@ -36,13 +36,14 @@ import { createAndAppendStyle } from "@utils/css";
 import { StartAt } from "@utils/types";
 
 import { get as dsGet } from "./api/DataStore";
+import { popNotice, showNotice } from "./api/Notices";
 import { NotificationData, showNotification } from "./api/Notifications";
 import { initPluginManager, PMLogger, startAllPlugins } from "./api/PluginManager";
 import { PlainSettings, Settings, SettingsStore } from "./api/Settings";
 import { getCloudSettings, putCloudSettings, shouldCloudSync } from "./api/SettingsSync/cloudSync";
 import { localStorage } from "./utils/localStorage";
 import { relaunch } from "./utils/native";
-import { checkForUpdates, update, UpdateLogger } from "./utils/updater";
+import { checkForUpdates, isOutdated as getIsOutdated, update, UpdateLogger } from "./utils/updater";
 import { onceReady } from "./webpack";
 import { openUserSettingsPanel } from "./webpack/common";
 import { patches } from "./webpack/patchWebpack";
@@ -140,28 +141,68 @@ async function runUpdateCheck() {
 
     try {
         const isOutdated = await checkForUpdates();
+        if (IS_DISCORD_DESKTOP) VencordNative.tray.setUpdateState(isOutdated);
         if (!isOutdated) return;
 
         if (Settings.autoUpdate) {
             await update();
             if (Settings.autoUpdateNotification) {
-                notify({
-                    title: "Equicord has been updated!",
-                    body: "Click here to restart",
-                    onClick: relaunch
-                });
+                if (notifiedForUpdatesThisSession) return;
+                notifiedForUpdatesThisSession = true;
+
+                showNotice(
+                    "Equicord has been updated!",
+                    "Restart",
+                    relaunch
+                );
             }
             return;
         }
 
-        notify({
-            title: "A Equicord update is available!",
-            body: "Click here to view the update",
-            onClick: () => openSettingsTabModal(UpdaterTab!)
-        });
+        if (notifiedForUpdatesThisSession) return;
+        notifiedForUpdatesThisSession = true;
+
+        showNotice(
+            "A new version of Equicord is available!",
+            "View Update",
+            () => openSettingsTabModal(UpdaterTab!)
+        );
     } catch (err) {
         UpdateLogger.error("Failed to check for updates", err);
     }
+}
+
+function initTrayIpc() {
+    if (IS_WEB || IS_UPDATER_DISABLED) return;
+
+    VencordNative.tray.onCheckUpdates(async () => {
+        try {
+            const isOutdated = await checkForUpdates();
+            VencordNative.tray.setUpdateState(isOutdated);
+
+            if (isOutdated) {
+                showNotice("An Equicord update is available!", "View Update", () => openSettingsTabModal(UpdaterTab!));
+            } else {
+                showNotice("No updates available, you're on the latest version!", "OK", popNotice);
+            }
+        } catch (err) {
+            UpdateLogger.error("Failed to check for updates from tray", err);
+            showNotice("Failed to check for updates, check the console for more info", "OK", popNotice);
+        }
+    });
+
+    VencordNative.tray.onRepair(async () => {
+        try {
+            const res = await VencordNative.updater.rebuild();
+            if (!res.ok) throw res.error;
+
+            showNotice("Equicord has been repaired!", "Restart", relaunch);
+        } catch (err) {
+            UpdateLogger.error("Failed to repair Equicord", err);
+        }
+    });
+
+    VencordNative.tray.setUpdateState(getIsOutdated);
 }
 
 async function init() {
@@ -169,6 +210,7 @@ async function init() {
     startAllPlugins(StartAt.WebpackReady);
 
     syncSettings();
+    initTrayIpc();
 
     if (!IS_DEV && !IS_WEB && !IS_UPDATER_DISABLED) {
         runUpdateCheck();

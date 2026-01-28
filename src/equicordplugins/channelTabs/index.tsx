@@ -59,14 +59,22 @@ export default definePlugin({
         // add the channel tab container at the top
         {
             find: '"AppView"',
-            replacement: {
-                match: /(\?void 0:(\i)\.channelId.{0,300})"div",{/,
-                replace: "$1$self.render,{currentChannel:$2,"
-            }
+            replacement: [
+                {
+                    match: /(\?void 0:(\i)\.channelId.{0,600})"div",{(?=className:\i\.\i)/,
+                    replace: "$1$self.render,{currentChannel:$2,",
+                    predicate: () => settings.store.tabBarPosition === "top"
+                },
+                {
+                    match: /(\?void 0:(\i)\.channelId.{0,300})"div",{/,
+                    replace: "$1$self.render,{currentChannel:$2,",
+                    predicate: () => settings.store.tabBarPosition === "bottom"
+                }
+            ]
         },
         // intercept channel navigation to switch/create tabs
         {
-            find: "sourceLocationStack,null",
+            find: '"transitionToGuild - Transitioning to "',
             replacement: {
                 match: /(\i\((\i),(\i),\i,\i\)\{)(.{0,25}"transitionToGuild)/,
                 replace: "$1$self.handleNavigation($2,$3);$4"
@@ -74,17 +82,17 @@ export default definePlugin({
         },
         // ctrl click to open in new tab in inbox unread
         {
-            find: ".messageContainer,onKeyDown",
+            find: '[data-recents-channel="',
             replacement: {
-                match: /.jumpButton,onJump:\i=>(\i)\(\i,(\i)\.id\)/,
-                replace: ".jumpButton,onJump: event => { if (event.ctrlKey) $self.open($2); else $1(event, $2.id) }"
+                match: /(?<=className:\i.\i,onJump:)\i=>(\i)\(\i,(\i)\.id\)/,
+                replace: "event => { if (event.ctrlKey) $self.open($2); else $1(event, $2.id) }"
             }
         },
         // ctrl click to open in new tab in inbox mentions
         {
             find: ".deleteRecentMention(",
             replacement: {
-                match: /(?<=.jumpMessageButton,onJump:)(\i)(?=.{0,20}message:(\i))/,
+                match: /(?<=className:\i.\i,onJump:)(\i)(?=.{0,20}message:(\i))/,
                 replace: "event => { if (event.ctrlKey) $self.open($2); else $1(event) }"
             }
         },
@@ -98,7 +106,7 @@ export default definePlugin({
         },
         // prevent issues with the pins/inbox popouts being too tall
         {
-            find: ".messagesPopoutWrap),style",
+            find: "renderCloseButton()",
             replacement: {
                 match: /\i&&\((\i).maxHeight.{0,5}\)/,
                 replace: "$&;$1.maxHeight-=$self.containerHeight"

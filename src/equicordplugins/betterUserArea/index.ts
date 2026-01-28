@@ -50,7 +50,7 @@ const settings = definePluginSettings({
 export default definePlugin({
     name: "BetterUserArea",
     description: "Customize and make the user area more clean.",
-    authors: [EquicordDevs.Prism],
+    authors: [EquicordDevs.prism],
     settings,
     patches: [
         {
@@ -63,10 +63,24 @@ export default definePlugin({
         },
         {
             find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
-            replacement: {
-                match: /\{showRefreshedAudioContextMenu:(\i)\}=(?=.+?location:"\w+Button")/g,
-                replace: "{showRefreshedAudioContextMenu:$1}=$self.settings.store.removeAudioMenus?{showRefreshedAudioContextMenu:!1}:"
-            },
+            replacement: [
+                {
+                    match: /(?<=#{intl::MUTE}\),)className:\i\.\i,/,
+                    replace: ""
+                },
+                {
+                    match: /(?<=#{intl::DEAFEN}\),)className:\i\.\i,/,
+                    replace: ""
+                },
+                {
+                    match: /,\(0,\i\.jsxs?\)\(\i\.\i,\{.{0,600}#{intl::ACCOUNT_INPUT_OPTIONS}\)\}\)(?=\])/,
+                    replace: ""
+                },
+                {
+                    match: /,\(0,\i\.jsxs?\)\(\i\.\i,\{.{0,650}#{intl::ACCOUNT_OUTPUT_OPTIONS}\)\}\)(?=\])/,
+                    replace: ""
+                }
+            ],
             predicate: () => settings.store.removeAudioMenus
         },
         {
@@ -79,10 +93,20 @@ export default definePlugin({
         },
         {
             find: "#{intl::ACCOUNT_SPEAKING_WHILE_MUTED}",
-            replacement: {
-                match: /tooltipText:\i,/g,
-                replace: "tooltipText:void 0,"
-            },
+            replacement: [
+                {
+                    match: /:\{tooltipText:\i\};/,
+                    replace: ":{tooltipText:void 0};"
+                },
+                {
+                    match: /(?<=role:"switch",)tooltipText:\i\}/,
+                    replace: "tooltipText:void 0}"
+                },
+                {
+                    match: /(?<=useRef\(null\);)(\i)=.{0,100}#{intl::USER_SETTINGS}\);/,
+                    replace: "$1=void 0;"
+                }
+            ],
             predicate: () => settings.store.removeButtonTooltips
         },
         {

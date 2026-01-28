@@ -9,9 +9,14 @@ import { DataStore } from "@api/index";
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
+import { classes } from "@utils/misc";
 import definePlugin, { OptionType } from "@utils/types";
+import { findCssClassesLazy } from "@webpack";
 import { Button, Menu } from "@webpack/common";
 import React, { ReactNode } from "react";
+
+const CodeContainerClasses = findCssClassesLazy("markup", "codeContainer");
+const MessageContentClasses = findCssClassesLazy("messageContent", "messageContentTrailingIcon");
 
 const settings = definePluginSettings({
     showGif: {
@@ -45,13 +50,13 @@ function blockedComponentRender(sticker) {
 
     if (showGif) {
         elements.push(
-            <img key="gif" src="https://ssd-cdn.nest.rip/uploads/b1bba1be-48d4-4873-880b-b4ff1a497bc6.gif" style={{ width: "160px", borderRadius: "20px" }} />
+            <img key="gif" src="https://equicord.org/assets/plugins/stickerBlocker/blocked.gif" style={{ width: "160px", borderRadius: "20px" }} />
         );
     }
 
     if (showMessage) {
         elements.push(
-            <div key="message" id="message-content-1205482612316184657" className={"markup_a7e664 messageContent__21e69"}><span>Blocked Sticker. ID: {sticker.id}, NAME: {sticker.name}</span></div>
+            <div key="message" id="vc-blocked-sticker" className={classes(CodeContainerClasses.markup, MessageContentClasses.messageContent)}><span>Blocked Sticker. ID: {sticker.id}, NAME: {sticker.name}</span></div>
         );
     }
 

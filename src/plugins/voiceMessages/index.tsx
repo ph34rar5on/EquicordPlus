@@ -35,7 +35,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { chooseFile } from "@utils/web";
 import { CloudUpload } from "@vencord/discord-types";
 import { CloudUploadPlatform } from "@vencord/discord-types/enums";
-import { findByPropsLazy, findLazy, findStoreLazy } from "@webpack";
+import { findCssClassesLazy, findLazy, findStoreLazy } from "@webpack";
 import { Button, Constants, FluxDispatcher, Forms, lodash, Menu, MessageActions, PermissionsBits, PermissionStore, RestAPI, SelectedChannelStore, showToast, SnowflakeUtils, Toasts, useEffect, useState } from "@webpack/common";
 
 import { VoiceRecorderDesktop } from "./components/DesktopRecorder";
@@ -58,7 +58,7 @@ const EMPTY_META: AudioMetadata = {
 
 const CloudUploadConstructor = findLazy(m => m.prototype?.trackUploadFinished) as typeof CloudUpload;
 const PendingReplyStore = findStoreLazy("PendingReplyStore");
-const OptionClasses = findByPropsLazy("optionName", "optionIcon", "optionLabel");
+const OptionClasses = findCssClassesLazy("optionName", "optionIcon", "optionLabel");
 
 export const cl = classNameFactory("vc-vmsg-");
 
@@ -283,7 +283,7 @@ export const settings = definePluginSettings({
 export default definePlugin({
     name: "VoiceMessages",
     description: "Allows you to send voice messages like on mobile. To do so, right click the upload button and click Send Voice Message.",
-    authors: [Devs.Ven, Devs.Vap, Devs.Nickyux, EquicordDevs.Z1xus, EquicordDevs.Prism],
+    authors: [Devs.Ven, Devs.Vap, Devs.Nickyux, EquicordDevs.Z1xus, EquicordDevs.prism],
     settings,
 
     contextMenus: {
