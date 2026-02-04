@@ -306,7 +306,7 @@ export default definePlugin({
     },
 
     WatchIndicator() {
-        const { plugins: { WatchUser: { watchUserId } } } = useSettings(["plugins.WatchUser.watchUserId"]);
+        const { plugins: { WatchUsers: { watchUserId } } } = useSettings(["plugins.WatchUsers.watchUserId"]);
         if (watchUserId) {
             return (
                 <HeaderBarIcon
