@@ -138,13 +138,25 @@ const settings = definePluginSettings({
     },
     singleClickAction: {
         type: OptionType.SELECT,
-        description: "Action on single click with modifier",
+        description: "Action on single click (your messages)",
         options: actions,
         default: "DELETE"
     },
     singleClickModifier: {
         type: OptionType.SELECT,
-        description: "Modifier required for single click action",
+        description: "Modifier required for single click action (your messages)",
+        options: singleClickModifiers,
+        default: "BACKSPACE"
+    },
+    singleClickOthersAction: {
+        type: OptionType.SELECT,
+        description: "Action on single click (others' messages)",
+        options: actions,
+        default: "DELETE"
+    },
+    singleClickOthersModifier: {
+        type: OptionType.SELECT,
+        description: "Modifier required for single click action (others' messages)",
         options: singleClickModifiers,
         default: "BACKSPACE"
     },
@@ -199,6 +211,11 @@ const settings = definePluginSettings({
         description: "Max hold time for double-click actions (ms). Holding longer allows text selection",
         markers: makeRange(50, 500, 50),
         default: 150
+    },
+    deferDoubleClickForTriple: {
+        type: OptionType.BOOLEAN,
+        description: "Delay double-click to allow triple-click actions (disables triple-click when off)",
+        default: true
     },
     selectionHoldTimeout: {
         type: OptionType.NUMBER,
@@ -510,13 +527,17 @@ export default definePlugin({
 
         if ((settings.store.disableInDms && isDM) || (settings.store.disableInSystemDms && isSystemDM)) return;
 
-        const singleClickAction = settings.store.singleClickAction as ClickAction;
+        const singleClickAction = isMe
+            ? (settings.store.singleClickAction as ClickAction)
+            : (settings.store.singleClickOthersAction as ClickAction);
         const doubleClickAction = isMe
             ? (settings.store.doubleClickAction as ClickAction)
             : (settings.store.doubleClickOthersAction as ClickAction);
         const tripleClickAction = settings.store.tripleClickAction as ClickAction;
 
-        const singleClickModifier = settings.store.singleClickModifier as Modifier;
+        const singleClickModifier = isMe
+            ? (settings.store.singleClickModifier as Modifier)
+            : (settings.store.singleClickOthersModifier as Modifier);
         const doubleClickModifier = settings.store.doubleClickModifier as Modifier;
         const tripleClickModifier = settings.store.tripleClickModifier as Modifier;
 
@@ -538,6 +559,12 @@ export default definePlugin({
         }
 
         if (isTripleClick) {
+            if (!settings.store.deferDoubleClickForTriple) {
+                mouseDownCount = 0;
+                doubleClickDetected = false;
+                secondMouseDownTime = 0;
+                return;
+            }
             if (doubleClickTimeout) {
                 clearTimeout(doubleClickTimeout);
                 doubleClickTimeout = null;
@@ -556,7 +583,14 @@ export default definePlugin({
         }
 
         const canDoubleClick = (isModifierPressed(doubleClickModifier) || doubleClickModifier === "NONE") && doubleClickAction !== "NONE";
-        const canTripleClick = isModifierPressed(tripleClickModifier) && tripleClickAction !== "NONE";
+        const canTripleClick =
+            settings.store.deferDoubleClickForTriple &&
+            isModifierPressed(tripleClickModifier) &&
+            tripleClickAction !== "NONE";
+        const shouldDeferDoubleClick =
+            canDoubleClick &&
+            canTripleClick &&
+            doubleClickModifier === tripleClickModifier;
 
         if (isDoubleClick) {
             doubleClickFired = true;
@@ -576,7 +610,7 @@ export default definePlugin({
                 }
             };
 
-            if (canTripleClick && canDoubleClick) {
+            if (shouldDeferDoubleClick) {
                 if (doubleClickTimeout) {
                     clearTimeout(doubleClickTimeout);
                 }
@@ -613,8 +647,10 @@ export default definePlugin({
                 secondMouseDownTime = 0;
             };
 
-            const hasDoubleClickAction = settings.store.doubleClickAction !== "NONE" || settings.store.doubleClickOthersAction !== "NONE";
-            if (hasDoubleClickAction && singleClickModifier === "NONE") {
+            const canDoubleClickWithCurrentModifier =
+                doubleClickAction !== "NONE" &&
+                (doubleClickModifier === "NONE" || isModifierPressed(doubleClickModifier));
+            if (canDoubleClickWithCurrentModifier && singleClickModifier === "NONE") {
                 singleClickTimeout = setTimeout(() => {
                     executeSingleClick();
                     singleClickTimeout = null;

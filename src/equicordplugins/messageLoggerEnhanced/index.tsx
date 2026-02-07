@@ -242,7 +242,7 @@ async function processMessageFetch(response: FetchMessagesResponse) {
 export default definePlugin({
     name: "MessageLoggerEnhanced",
     authors: [Devs.Aria, EquicordDevs.keyages],
-    description: "G'day",
+    description: "Improves MessageLogger with edited message history, ghost ping detection and more",
     dependencies: ["MessageLogger"],
 
     patches: [
@@ -261,7 +261,7 @@ export default definePlugin({
             ]
         },
         {
-            find: "THREAD_STARTER_MESSAGE?null==",
+            find: ".PREMIUM_REFERRAL&&(",
             replacement: {
                 match: /deleted:\i\.deleted, editHistory:\i\.editHistory,/,
                 replace: "deleted:$self.getDeleted(...arguments), editHistory:$self.getEdited(...arguments),"
