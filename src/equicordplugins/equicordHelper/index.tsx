@@ -86,12 +86,6 @@ const settings = definePluginSettings({
         restartNeeded: true,
         default: false,
     },
-    noDefaultHangStatus: {
-        type: OptionType.BOOLEAN,
-        description: "Disable the default hang status when joining voice channels",
-        restartNeeded: true,
-        default: false,
-    },
     refreshSlashCommands: {
         type: OptionType.BOOLEAN,
         description: "Refreshes Slash Commands to show newly added commands without restarting your client.",
@@ -210,18 +204,9 @@ export default definePlugin({
                 replace: "$& && false"
             }
         },
-        // No Default Hang Status
-        {
-            find: ".CHILLING)",
-            predicate: () => settings.store.noDefaultHangStatus,
-            replacement: {
-                match: /{enableHangStatus:(\i),/,
-                replace: "{_enableHangStatus:$1=false,"
-            }
-        },
         // Force Role Icon
         {
-            find: "Message Username",
+            find: "#{intl::GUILD_COMMUNICATION_DISABLED_ICON_TOOLTIP_BODY}",
             predicate: () => settings.store.forceRoleIcon,
             replacement: {
                 match: /(?<=\}\):null\].{0,150}\?2:)0(?=\})/,
