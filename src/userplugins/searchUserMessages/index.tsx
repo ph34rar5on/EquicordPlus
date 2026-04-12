@@ -22,7 +22,7 @@ import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
 import { findByPropsLazy } from "@webpack";
 import { Menu } from "@webpack/common";
-import type { User } from "discord-types/general";
+import type { User } from "@vencord/discord-types";
 import { Util } from "Vencord";
 
 const { search } = findByPropsLazy("search", "searchByMode");
