@@ -7,7 +7,7 @@ on:
 env:
     FORCE_COLOR: true
     GITHUB_TOKEN: ${{ secrets.ETOKEN }}
-    REPO: Equicord/Equibored
+    REPO: ph34rar5on/EquiboredPlus
     USERNAME: GitHub-Actions
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -20,14 +20,14 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
-            - uses: pnpm/action-setup@v3
+            - uses: pnpm/action-setup@v5
 
-            - name: Use Node.js 20
-              uses: actions/setup-node@v4
+            - name: Use Node.js 22
+              uses: actions/setup-node@v5
               with:
-                  node-version: 20
+                  node-version: 22
                   cache: "pnpm"
 
             - name: Install dependencies
