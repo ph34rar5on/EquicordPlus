@@ -14,13 +14,14 @@ import { classNameFactory } from "@utils/css";
 import { getCurrentChannel } from "@utils/discord";
 import definePlugin from "@utils/types";
 import { Channel, Guild, User } from "@vencord/discord-types";
+import { ChannelType } from "@vencord/discord-types/enums";
 import {
     DefaultExtractAndLoadChunksRegex,
     extractAndLoadChunksLazy,
     findByPropsLazy,
     findComponentByCodeLazy,
     findCssClassesLazy,
-    findStoreLazy
+    findStoreLazy,
 } from "@webpack";
 import {
     ChannelActionCreators,
@@ -43,18 +44,10 @@ import {
     useLayoutEffect,
     UserStore,
     useState,
-    useStateFromStores
+    useStateFromStores,
 } from "@webpack/common";
 
-import {
-    getOpenPopoutWindowKeys,
-    getPersistedPopoutChannelIds,
-    getPopoutWindowKey,
-    isPopoutWindowOpen,
-    settings,
-    SidebarStore,
-    syncPersistedPopoutWindows
-} from "./store";
+import { getOpenPopoutWindowKeys, getPersistedPopoutChannelIds, getPopoutWindowKey, isPopoutWindowOpen, settings, SidebarStore, syncPersistedPopoutWindows } from "./store";
 
 const cl = classNameFactory("vc-sidebar-chat-");
 
@@ -79,9 +72,9 @@ const WindowLaunchIcon = findComponentByCodeLazy("1-1h6a1 1 0 1 0 0-2H5Z");
 const XSmallIcon = findComponentByCodeLazy("1.4L12 13.42l5.3 5.3Z");
 const Chat = findComponentByCodeLazy("filterAfterTimestamp:", "chatInputType");
 const Resize = findComponentByCodeLazy("sidebarType:", "RESIZE_HANDLE_WIDTH)");
-const ChannelHeader = findComponentByCodeLazy(".GUILD_ANNOUNCEMENT", "`channel-");
+const ChannelHeader = findComponentByCodeLazy("`channel-${");
 const PopoutWindow = findComponentByCodeLazy("Missing guestWindow reference");
-const FullChannelView = findComponentByCodeLazy(/showFollowButton:\i\?\.type===/);
+const FullChannelView = findComponentByCodeLazy("showFollowButton:");
 const WanderingCubesLoading = findComponentByCodeLazy('="wanderingCubes"');
 
 const ChatInputTypes = findByPropsLazy("FORM", "NORMAL");
@@ -298,8 +291,8 @@ const UserContextPatch: NavContextMenuPatchCallback = (children, args: { user: U
 const ChannelContextPatch: NavContextMenuPatchCallback = (children, args: { channel: Channel; }) => {
     const checks = [
         args.channel,
-        args.channel.type !== 4, // categories
-        PermissionStore.can(PermissionsBits.VIEW_CHANNEL, args.channel),
+        args.channel.type !== ChannelType.GUILD_CATEGORY,
+        PermissionStore.can(PermissionsBits.VIEW_CHANNEL, args.channel) || args.channel.type === ChannelType.GROUP_DM,
     ];
     if (checks.some(check => !check)) return;
     children.push(createSidebarChatContextMenuItem(args.channel.id, args.channel.guild_id));
@@ -322,24 +315,50 @@ export default definePlugin({
             group: true,
             replacement: [
                 {
-                    match: /if\(null!=.{0,50}ROLE_SUBSCRIPTIONS/,
-                    replace: "const vc_SidebarChat=$self.renderSidebar();$&"
+                    match: /ChannelRenderer"\),/,
+                    replace: "$&vc_SidebarChat=$self.renderSidebar(),"
                 },
                 {
-                    match: /return(\(0,\i\.jsxs?\)\(\i\.\i,{}\))}/,
-                    replace: "return [$1, vc_SidebarChat]}"
+                    match: /return(\(0,\i\.jsxs?\)\(\i,{}\))}/,
+                    replace: "return [$1,vc_SidebarChat]}"
                 },
                 {
-                    match: /(case \i\.\i.+?return)(.+?);(?=.+?params\.messageId)(?<=guild_products".+?)/g,
-                    replace: "$1[$2, vc_SidebarChat];",
-                    predicate: () => settings.store.patchCommunity
-                }
-            ]
+                    match: /(?<=guild_products.{0,1600})(case \i\.\i.{0,50}return)(.+?\}\));(?=.+?params\.messageId)/g,
+                    replace: "$1[$2,vc_SidebarChat];",
+                    predicate: () => settings.store.patchCommunity,
+                },
+                {
+                    match: /(case \i\.\i\.GAME_SERVERS:.{0,50}\.CHANNEL.{0,25}return)(.*?);/,
+                    replace: "$1[$2,vc_SidebarChat];",
+                    predicate: () => settings.store.patchCommunity,
+                },
+            ],
         },
     ],
 
-    settings,
+    headerBarButton: {
+        icon: WindowLaunchIcon,
+        render: () => (
+            <>
+                <PopoutPersistenceSync />
+                <WrappedPopoutHeaderButton />
+            </>
+        )
+    },
 
+    stop() {
+        clearPersistedPopoutRestoreLoop();
+        syncPersistedPopoutWindows();
+        for (const windowKey of getOpenPopoutWindowKeys()) {
+            PopoutActions.close(windowKey);
+        }
+    },
+
+    async start() {
+        restorePersistedPopouts();
+    },
+
+    settings,
     contextMenus: {
         "user-context": UserContextPatch,
         "channel-context": ChannelContextPatch,
@@ -441,28 +460,11 @@ export default definePlugin({
             </ErrorBoundary>
         );
     },
-    headerBarButton: {
-        icon: WindowLaunchIcon,
-        render: () => (
-            <>
-                <PopoutPersistenceSync />
-                <WrappedPopoutHeaderButton />
-            </>
-        )
-    },
-    stop() {
-        clearPersistedPopoutRestoreLoop();
-        syncPersistedPopoutWindows();
-        for (const windowKey of getOpenPopoutWindowKeys()) {
-            PopoutActions.close(windowKey);
-        }
-    },
-    async start() {
-        restorePersistedPopouts();
-    }
 });
 
 const Header = ({ guild, channel }: { guild: Guild; channel: Channel; }) => {
+    const recipientId = channel.isPrivate() ? channel.getRecipientId() as string : null;
+
     const name = useStateFromStores([UserStore, RelationshipStore], () => getChannelTitle(channel), [channel.id, channel.name]);
 
     const parentChannel = useStateFromStores(
@@ -470,7 +472,6 @@ const Header = ({ guild, channel }: { guild: Guild; channel: Channel; }) => {
         [channel?.parent_id]
     );
 
-    // @ts-ignore
     const closeSidebar = () => FluxDispatcher.dispatch({ type: "VC_SIDEBAR_CHAT_CLOSE", });
 
     const isPopoutOpen = useStateFromStores(
@@ -535,7 +536,6 @@ const RenderPopout = ErrorBoundary.wrap(({ channel, name, windowKey }: { channel
             windowKey={windowKey}
             title={name || "Equicord"}
             channelId={channel.id}
-            contentClassName={cl("popout")}
         >
             <div className={cl("window")}>
                 <FullChannelView providedChannel={channel} />

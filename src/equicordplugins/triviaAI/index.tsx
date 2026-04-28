@@ -5,17 +5,14 @@
  */
 
 import { findGroupChildrenByChildId, NavContextMenuPatchCallback } from "@api/ContextMenu";
+import { RobotIcon } from "@components/Icons";
 import { EquicordDevs } from "@utils/constants";
-import definePlugin, { IconComponent } from "@utils/types";
+import definePlugin from "@utils/types";
 import { Message } from "@vencord/discord-types";
-import { findExportedComponentLazy } from "@webpack";
 import { ChannelStore, Menu } from "@webpack/common";
 
 import { settings } from "./settings";
 import { getPayload, getResponse, handleResponse } from "./utils";
-
-const RobotIconLazy = findExportedComponentLazy("RobotIcon");
-const RobotIcon: IconComponent = props => <RobotIconLazy {...props} />;
 
 const messageCtxPatch: NavContextMenuPatchCallback = (children, { message }: { message: Message; }) => {
     const payload = getPayload(message);
