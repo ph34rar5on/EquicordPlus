@@ -9,10 +9,10 @@ import { CodeBlock } from "@components/CodeBlock";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { Heading } from "@components/Heading";
+import { ChevronSmallDownIcon, ChevronSmallUpIcon, FolderIcon } from "@components/Icons";
 import { classNameFactory } from "@utils/css";
 import { copyWithToast } from "@utils/discord";
 import { closeModal, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalRoot, ModalSize, openModal } from "@utils/modal";
-import { findExportedComponentLazy } from "@webpack";
 import { useEffect, useMemo, useRef, useState } from "@webpack/common";
 
 import {
@@ -30,11 +30,8 @@ import {
     ZipPreviewCacheState
 } from "./utils";
 
-const ChevronSmallDownIcon = findExportedComponentLazy("ChevronSmallDownIcon");
-const ChevronSmallUpIcon = findExportedComponentLazy("ChevronSmallUpIcon");
-const FolderIcon = findExportedComponentLazy("FolderIcon");
-
 export const cl = classNameFactory("vc-zip-preview-");
+const breadcrumbColorStyle = { color: "var(--text-muted)" };
 
 interface VisibleEntries {
     directories: string[];
@@ -72,6 +69,7 @@ export function ZipPreviewInline(props: ZipPreviewAttachmentProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isContentMounted, setIsContentMounted] = useState(false);
     const [currentPath, setCurrentPath] = useState("");
+    const ToggleIcon = isExpanded ? ChevronSmallUpIcon : ChevronSmallDownIcon;
     const animationFrameRef = useRef<number | null>(null);
     const animationTimeoutRef = useRef<number | null>(null);
     const loadRequestIdRef = useRef(0);
@@ -152,9 +150,7 @@ export function ZipPreviewInline(props: ZipPreviewAttachmentProps) {
                     setExpanded(!isExpanded);
                 }}
             >
-                {isExpanded
-                    ? <ChevronSmallUpIcon className={cl("toggle-icon")} />
-                    : <ChevronSmallDownIcon className={cl("toggle-icon")} />}
+                <ToggleIcon className={cl("toggle-icon")} />
             </button>
         </div>
     );
@@ -197,8 +193,8 @@ function ZipPreviewBreadcrumb({ path, onNavigate }: { path: string; onNavigate: 
     if (!path) {
         return (
             <div className={cl("breadcrumb")}>
-                <FolderIcon className={cl("breadcrumb-icon")} />
-                <span className={cl("breadcrumb-current")}>/</span>
+                <FolderIcon className={cl("breadcrumb-icon")} style={breadcrumbColorStyle} />
+                <span className={cl("breadcrumb-current")} style={breadcrumbColorStyle}>/</span>
             </div>
         );
     }
@@ -207,7 +203,7 @@ function ZipPreviewBreadcrumb({ path, onNavigate }: { path: string; onNavigate: 
 
     return (
         <div className={cl("breadcrumb")}>
-            <FolderIcon className={cl("breadcrumb-icon")} />
+            <FolderIcon className={cl("breadcrumb-icon")} style={breadcrumbColorStyle} />
             <button
                 className={cl("breadcrumb-segment")}
                 type="button"
@@ -226,7 +222,7 @@ function ZipPreviewBreadcrumb({ path, onNavigate }: { path: string; onNavigate: 
                 return (
                     <span key={segmentPath}>
                         {isLast
-                            ? <span className={cl("breadcrumb-current")}>{part}/</span>
+                            ? <span className={cl("breadcrumb-current")} style={breadcrumbColorStyle}>{part}/</span>
                             : (
                                 <button
                                     className={cl("breadcrumb-segment")}
