@@ -359,16 +359,26 @@ export const pathAliasPlugin = {
                 
                 // Check if the path already has an extension
                 if (resolvedPath.match(/\.[a-z]+$/)) {
-                    // If it has an extension, try different extensions
+                    // First try the path as-is (e.g. characters.json exists)
+                    if (await exists(resolvedPath)) {
+                        return { path: resolvedPath };
+                    }
+
+                    // Try appending extensions to the full path (e.g. characters.json.ts)
+                    const appendExtensions = ['.ts', '.tsx', '.js', '.jsx'];
+                    for (const ext of appendExtensions) {
+                        const pathWithAppendedExt = resolvedPath + ext;
+                        if (await exists(pathWithAppendedExt)) {
+                            return { path: pathWithAppendedExt };
+                        }
+                    }
+
+                    // Try replacing the extension (e.g. characters.json -> characters.ts)
                     const basePathWithoutExt = resolvedPath.replace(/\.[a-z]+$/, '');
-                    const extensions = ['.ts', '.tsx', '.js', '.jsx'];
-                    
-                    for (const ext of extensions) {
+                    for (const ext of appendExtensions) {
                         const pathWithExt = basePathWithoutExt + ext;
                         if (await exists(pathWithExt)) {
-                            return {
-                                path: pathWithExt
-                            };
+                            return { path: pathWithExt };
                         }
                     }
                 } else {
