@@ -122,11 +122,7 @@ export const settings = definePluginSettings({
         type: OptionType.COMPONENT,
         component: CommandPaletteSettingsPanel
     },
-    compactStartEnabled: {
-        description: "Open the palette in compact mode first.",
-        type: OptionType.BOOLEAN,
-        default: true
-    },
+
     closeAfterExecute: {
         description: "Close palette after executing a command.",
         type: OptionType.BOOLEAN,
@@ -229,5 +225,8 @@ export default definePlugin({
         });
     },
 
-    chatBarButtonWrapper: wrapChatBarChildren,
+    chatBarButtonWrapper: {
+        wrapper: wrapChatBarChildren,
+        priority: 0,
+    },
 });

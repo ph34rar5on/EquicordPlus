@@ -28,7 +28,7 @@ import { useAwaiter } from "@utils/react";
 import definePlugin from "@utils/types";
 import { Guild, User } from "@vencord/discord-types";
 import { findCssClassesLazy } from "@webpack";
-import { Alerts, Clickable, IconUtils, Menu, Parser } from "@webpack/common";
+import { Clickable, ConfirmModal,IconUtils, Menu, openModal, Parser } from "@webpack/common";
 
 import { Auth, initAuth, updateAuth } from "./auth";
 import { openReviewsModal } from "./components/ReviewModal";
@@ -107,8 +107,9 @@ export default definePlugin({
                 }
             }
 
-            if (user.notification) {
-                const props = user.notification.type === NotificationType.Ban ? {
+            const { notification } = user;
+            if (notification) {
+                const props = notification.type === NotificationType.Ban ? {
                     cancelText: "Appeal",
                     confirmText: "Ok",
                     onCancel: async () =>
@@ -121,23 +122,30 @@ export default definePlugin({
                         )
                 } : {};
 
-                Alerts.show({
-                    title: user.notification.title,
-                    body: (
-                        Parser.parse(
-                            user.notification.content,
+                openModal(modalProps => (
+                    <ConfirmModal
+                        {...modalProps}
+                        title={notification.title}
+                        confirmText={props.confirmText ?? "OK"}
+                        cancelText={props.cancelText}
+                        variant="primary"
+                        onCancel={props.onCancel}
+                    >
+                        {Parser.parse(
+                            notification.content,
                             false
-                        )
-                    ),
-                    ...props
-                });
+                        )}
+                    </ConfirmModal>
+                ));
 
-                readNotification(user.notification.id);
+                readNotification(notification.id);
             }
         }, 4000);
     },
 
-    renderProfileCollection: ({ user, isSideBar = false }: { user: User; isSideBar?: boolean; }) => {
+    renderProfileCollection: {
+        priority: 0,
+        render: ({ user, isSideBar = false }: { user: User; isSideBar?: boolean; }) => {
         const [reviewData] = useAwaiter(() => getReviews(user.id, { limit: 4 }), { deps: [user.id], fallbackValue: null });
 
         // Discord are masters at using a crap ton of html elements and css classes to create a simple ui that could have
@@ -194,5 +202,6 @@ export default definePlugin({
         return isSideBar
             ? <div className={DMSideBarClasses.widgetPreviews}>{reviewsSection}</div>
             : reviewsSection;
-    }
+    },
+    },
 });
