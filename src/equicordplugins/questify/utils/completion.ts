@@ -8,14 +8,13 @@ import type { PluginNative } from "@utils/types";
 import type { Quest, User } from "@vencord/discord-types";
 import { QuestTaskType } from "@vencord/discord-types/enums";
 import { findByCodeLazy, findLazy } from "@webpack";
-import { FluxDispatcher, QuestStore, RestAPI, showToast, Toasts, UserStore } from "@webpack/common";
+import { AuthorizedAppsStore, FluxDispatcher, QuestStore, RestAPI, showToast, Toasts, UserStore } from "@webpack/common";
 
 import { getCurrentUserId, getQuestifySettings } from "../settings/access";
 import { autoCompleteQuestTaskTypes, isDesktopCompatible } from "../settings/def";
 import { resetQuestsToResume } from "../settings/fetching";
 import { getIgnoredQuestIDs } from "../settings/ignoredQuests";
 import { rerenderQuests } from "../settings/rerender";
-import { AuthorizedAppsStore } from "./fetching";
 import { normalizeQuestName } from "./filtering";
 import { QL } from "./logging";
 import { getQuestStatus, getQuestStoredProgress, isVideoQuestTask, QuestStatus, QuestTask, refreshQuest } from "./questState";
@@ -85,7 +84,7 @@ const reportVideoProgress = findByCodeLazy(".QUESTS_VIDEO_PROGRESS(") as (questI
 const sendHeartbeat = findByCodeLazy(".QUESTS_HEARTBEAT(") as (options: {
     questId: string;
     streamKey?: string;
-    applicationId: string;
+    applicationId?: string;
     terminal?: boolean;
     executableFingerprint?: unknown;
 }) => Promise<void>;
@@ -705,7 +704,7 @@ async function reportPlayQuestProgress(
     const attempts = options.attempts ?? 1;
     const delay = options.delay ?? 2500;
     const timeout = options.timeout ?? 10000;
-    const applicationId = options.applicationId ?? quest.config.application.id;
+    const applicationId = options.applicationId ?? entry.task.applications?.[0]?.id;
 
     for (let attempt = 1; attempt <= attempts; attempt++) {
         try {
@@ -1153,7 +1152,7 @@ export function stopAutoCompletesForRunningGames(gameIds: string[]): boolean {
     for (const entry of Array.from(activeAutoCompletes.values())) {
         const quest = QuestStore.getQuest(entry.questId);
 
-        if (entry.kind === "play" && quest && gameIds.includes(quest.config.application.id)) {
+        if (entry.kind === "play" && quest && entry.task.applications?.some(({ id }) => gameIds.includes(id))) {
             stopQuestAutoComplete(quest, { manual: false, preserveResume: false });
             stoppedAny = true;
         }
