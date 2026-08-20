@@ -1,0 +1,80 @@
+.vc-messagepurge-root {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 8px;
+}
+
+.vc-messagepurge-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vc-messagepurge-field-label {
+    margin-bottom: 0;
+}
+
+.vc-messagepurge-target-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-messagepurge-checkbox-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-messagepurge-range-row {
+    display: flex;
+    gap: 12px;
+}
+
+.vc-messagepurge-range-row > * {
+    flex: 1;
+}
+
+.vc-messagepurge-target-row > *:first-child {
+    flex-grow: 1;
+}
+
+.vc-messagepurge-actions-row {
+    display: flex;
+    gap: 8px;
+}
+
+.vc-messagepurge-progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.vc-messagepurge-log {
+    height: 160px;
+    padding: 8px;
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    font-family: var(--font-code, monospace);
+    font-size: 12px;
+}
+
+.vc-messagepurge-log-line {
+    margin-bottom: 2px;
+    color: var(--text-default);
+}
+
+.vc-messagepurge-log-line.warn {
+    color: var(--text-warning);
+}
+
+.vc-messagepurge-log-line.error {
+    color: var(--text-danger);
+}
+
+.vc-messagepurge-log-line.success {
+    color: var(--text-positive);
+}
